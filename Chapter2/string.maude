@@ -1,0 +1,18 @@
+fmod STRING is protecting NAT .
+  sorts String Char FindResult .
+  subsort Char < String .
+  subsort Nat < FindResult .
+  op <Strings> : -> Char [special (id-hook StringSymbol)] .
+  op <Strings> : -> String [ditto] .
+  op notFound : -> FindResult [ctor] .
+
+  op ascii : Char -> Nat [...] .
+  op char : Nat ~> Char [...] .
+  op _+_ : String String -> String [...] .
+  op length : String -> Nat [...] .
+  op substr : String Nat Nat -> String [...] .
+  op find : String String Nat -> FindResult [...] .
+  op rfind : String String Nat -> FindResult [...] .
+  op _<=_ : String String -> Bool [...] .
+  *** ...
+endfm
