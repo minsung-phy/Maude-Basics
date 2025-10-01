@@ -1,0 +1,24 @@
+fmod NAT is protecting BOOL .
+    sorts Zero NzNat Nat .
+    subsort Zero NzNat < Nat .
+    op 0 : -> Zero [ctor] .
+    op s_ : Nat -> NzNat [ctor iter special (...)] .
+    op _+_ : NzNat Nat -> NzNat [assoc comm prec 33 special (...)] .
+    op _+_ : Nat Nat -> Nat [ditto] .
+    op sd : Nat Nat -> Nat [comm special (...)] .
+    op _*_ : NzNat NzNat -> NzNat [assoc comm prec 31 special (...)] .
+    op _*_ : Nat Nat -> Nat [ditto] .
+    op _quo_ : Nat NzNat -> Nat [...] .
+    op _rem_ : Nat NzNat -> Nat [...] .
+    op _^_ : Nat Nat -> Nat [...] .
+    op gcd : NzNat Nat -> NzNat [...] .
+    op lcm : Nat Nat -> Nat [...] .
+    op min : Nat Nat -> Nat [...] .
+    op max : Nat Nat -> Nat [...] .
+    *** ...
+    op _<=_ : Nat Nat -> Bool [...] .
+    op _>_ : Nat Nat -> Bool [...] .
+    op _divides_ : NzNat Nat -> Bool [...] .
+endfm
+
+
