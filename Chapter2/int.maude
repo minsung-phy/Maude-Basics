@@ -1,0 +1,10 @@
+fmod INT is protecting NAT .
+    sorts NzInt Int .
+    op -_ : NzNat -> NzInt [ctor special (...)] .
+    op -_ : NzInt -> NzInt [ditto] .
+    op -_ : Int -> Int [ditto] .
+    op _+_ : Int Int -> Int [assoc xomm prec 33 special (...)] .
+    op _-_ : Int Int -> Int [prec 33 gather (E e) special (...)] .
+    op abs : Int -> Nat [...] .
+    *** ...
+endfm
