@@ -1,0 +1,14 @@
+fmod FLOAT is protecting BOOL .
+    sorts FiniteFloat Float .
+    subsort FiniteFloat < Float .
+    op <floats> : -> FiniteFloat [special (id-hook FloatSymbol)] .
+    op <float> : -> Float [ditto] .
+    *** ...
+    op sqrt : Float ~> Float [...] .
+    op log : Float ~> Float [...] .
+    op sin : Float -> Float [...] .
+    op cos : Float -> Float [...] .
+    op asin : Float ~> Float [...] .
+    op acos : Float ~> Float [...] .
+    *** ...
+endfm
