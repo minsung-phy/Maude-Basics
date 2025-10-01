@@ -1,0 +1,9 @@
+fmod M is
+  sort s .
+  ops a b c : -> s .
+  ops f h : s s s -> s .
+  op g : s s -> s .
+  vars x y z : s .
+  eq f(a, g(b, x), y) = f(a, b, y) .
+  eq h(c, c, z) = h(a, b, c) .
+endfm
