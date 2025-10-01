@@ -1,0 +1,30 @@
+fmod RAT is protecting INT .
+    sorts PosRat NzRat Rat .
+    subsorts NzInt < NzRat Int < Rat .
+    subsorts NzNat < PosRat < NzRat .
+    op _/_ : NzInt NzNat -> NzRat [ctor prec 31 ... special (...)] .
+    op _/_ : NzNat NzNat -> PosRat [ctor ditto] .
+    op _/_ : PosRat PosRat -> PosRat [ditto] .
+    op _/_ : NzRat NzRat -> NzRat [ditto] .
+    op _/_ : Rat NzRat -> Rat [ditto] .
+    *** ...
+    ops trunc floor : PosRat -> Nat .
+    ops trunc floor ceiling : Rat -> Int .
+    op ceiling : PosRat -> NzNat .
+    op frac : Rat -> Rat .
+
+    var I : NzInt .
+    vars N M : NzNat .
+    var K : Int .
+
+    eq trunc(K) = K .
+    eq trunc(I / N) = I quo N .
+    eq floor(K) = K .
+    eq floor(N / M) = N quo M .
+    eq floor(- N / M) = - ceiling(N / M) .
+    eq ceiling(K) = K .
+    eq ceiling(N / M) = ( (N + M) - 1) quo M .
+    eq ceiling(- N / M) = - floor(N / M) .
+    eq frac(K) = 0 .
+    eq frac(I / N) = (I rem N) / N .
+endfm
