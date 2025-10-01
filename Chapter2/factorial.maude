@@ -1,0 +1,9 @@
+fmod FACTORIAL is protecting NAT .
+    op _! : Nat -> Nat .
+    var N : Nat .
+    eq 0 ! = 1 .
+    eq (s N) ! = s N * (N !) .
+endfm
+
+*** or using "standard" natural numbers and replacing the above equations with
+*** eq N ! = if N == 0 then 1 else N * (sd(N, 1) !) fi .
