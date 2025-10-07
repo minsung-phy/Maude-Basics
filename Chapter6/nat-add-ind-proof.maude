@@ -1,0 +1,7 @@
+fmod NAT-ADD-IND-PROOF is including NAT-ADD .
+  op t' : -> Nat .             --- 귀납법을 위한 일반 상수(generic constant)
+  eq t' + 0 = t' .             --- 귀납 가정 (induction hypothesis)
+endfm
+
+red 0 + 0 == 0 .               --- 기본 단계 (Base case: T는 0)
+red s(t') + 0 == s(t') .       --- 귀납 단계 (Induction step: T는 s(t'))
