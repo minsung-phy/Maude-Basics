@@ -1,0 +1,7 @@
+fmod NAT-ASSOC-IND-PROOF is including NAT-ADD .
+  ops t t2 t3 : -> Nat .
+  eq (t + t2) + t3 = t + (t2 + t3) .   --- 귀납 가정 (induction hypothesis)
+endfm
+
+red (0 + t2) + t3 == 0 + (t2 + t3) .   --- Base case
+red (s(t) + t2) + t3 == s(t) + (t2 + t3) .  --- Induction step
