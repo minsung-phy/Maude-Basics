@@ -1,0 +1,9 @@
+fmod PROVE-BINTREE is including BINTREE-NAT1 .
+  ops t1 t2 : -> BinTree .
+  op n : -> Nat .
+  eq size(reverse(t1)) = size(t1) .  --- Ind. Hyp.
+  eq size(reverse(t2)) = size(t2) .  --- Ind. Hyp.
+endfm
+
+red size(reverse(empty)) == size(empty) .
+red size(reverse(bintree(t1, n, t2))) == size(bintree(t1, n, t2)) .
