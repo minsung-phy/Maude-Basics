@@ -1,0 +1,6 @@
+mod CHOICE-INT is including INT .
+    op _?_ : Int Int -> Int [ctor] .
+    vars I J : Int .
+    rl [choose_first] : I ? J => I .
+    rl [choose_second] : I ? J => J .
+endm
