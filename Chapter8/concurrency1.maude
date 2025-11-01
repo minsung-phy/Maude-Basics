@@ -1,0 +1,12 @@
+mod CONC-1 is
+  sort S .
+  ops a a' b b' c c' d d' e e' f f' : -> S [ctor] .
+  op g : S S -> S [ctor] .
+  op h : S S S -> S [ctor] .
+  rl [11] : a => a' .
+  rl [12] : b => b' .
+  rl [13] : c => c' .
+  rl [14] : d => d' .
+  rl [15] : e => e' .
+  rl [16] : f => f' .
+endm
