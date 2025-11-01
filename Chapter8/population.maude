@@ -1,0 +1,27 @@
+mod POPULATION is protecting NAT + STRING .
+  sorts Person Population Status .
+  subsort Person < Population .
+  op empty : -> Population [ctor] .
+  op __ : Population Population -> Population
+            [ctor assoc comm id: empty] .
+  op person : String Nat Status -> Person [ctor] .
+  ops single divorced : -> Status [ctor] .
+  ops engaged separated married : String -> Status [ctor] .
+
+  vars X X’ : String .     vars M N : Nat .     vars S S’ : Status .
+
+  crl [birthday] :
+    person(X, N, S)  =>  person(X, N + 1, S)   if N <= 1000 .
+
+  crl [engagement] :
+    person(X, N, S)        person(X’, M, S’)
+    =>
+    person(X, N, engaged(X’))   person(X’, M, engaged(X))
+      if (S == single or S == divorced) /\  N >= 16
+         /\ (S’ == single or S’ == divorced) /\  M >= 16 .
+
+  rl [wedding] :
+    person(X, N, engaged(X’))    person(X’, M, engaged(X))
+    =>
+    person(X, N, married(X’))    person(X’, M, married(X)) .
+endm
