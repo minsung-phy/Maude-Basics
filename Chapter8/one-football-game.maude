@@ -1,0 +1,20 @@
+mod ONE-FOOTBALL-GAME is protecting NAT + STRING .
+    sort Game .
+    op _vs_ _: : String String Nat Nat -> Game [ctor] .
+    vars HOME AWAY : String .
+    vars M N : Nat .
+
+    *** The following rules model the home team scoring : 
+    rl [touchdown-home] : HOME vs AWAY M : N => HOME vs AWAY (M + 6) : N .
+    rl [field-goal-home] : HOME vs AWAY M : N => HOME vs AWAY (M + 3) : N .
+    rl [extra-point-kick-home] : HOME vs AWAY M : N => HOME vs AWAY (M + 1) : N .
+    rl [two-point-conversion-home] : HOME vs AWAY M : N => HOME vs AWAY (M + 2) : N .
+    rl [safety-home] : HOME vs AWAY M : N => HOME vs AWAY (M + 2) : N .
+
+    *** Scoring possibilities for the visiting team :
+    rl [touchdown-away] : HOME vs AWAY M : N => HOME vs AWAY M : (N + 6) .
+    rl [field-goal-away] : HOME vs AWAY M : N => HOME vs AWAY M : (N + 3) .
+    rl [extra-point-kick-away] : HOME vs AWAY M : N => HOME vs AWAY M : (N + 1) .
+    rl [two-point-conversion-away] : HOME vs AWAY M : N => HOME vs AWAY M : (N + 2) .
+    rl [safety-away] : HOME vs AWAY M : N => HOME vs AWAY M : (N + 2) .
+endm
