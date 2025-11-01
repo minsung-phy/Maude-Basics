@@ -1,0 +1,16 @@
+mod ONE-PERSON is protecting NAT + STRING .
+    sorts Person Status .
+    op person : String Nat Status -> Person [ctor] .
+    ops single engaged married separated divorced deceased widow widower : -> Status [ctor] .
+
+    var X : String . var N : Nat . var S : Status .
+
+    crl [birthday] : person(X, N, S) => person(X, N + 1, S)
+        if N <= 1000 /\ S =/= deceased .
+
+    crl [successful-proposal] : person(X, N, S) => person(X, N, engaged)
+        if N >= 15 /\ (S == single or S == divorced) .
+
+
+    rl [marriage] : person(X, N, engaged) => person(X, N, married) .
+endm
