@@ -1,0 +1,8 @@
+mod SORT is protecting INT .
+    sort List .
+    subsort Int < List .
+    op nil : -> List [ctor] .
+    op __ : List List -> List [assoc id: nil ctor] .
+    vars I J : Int .  var L : List .
+    crl [swap] : I L J => J L I if J < I .
+endm
