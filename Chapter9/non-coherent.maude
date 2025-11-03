@@ -1,0 +1,10 @@
+mod NON-COHERENT is
+    sort s .
+    ops a d b : -> s .
+    ops c f : -> s [ctor] .
+
+    eq a = b .
+    eq b = c .
+    eq d = f .
+    rl [l] : b => d .
+endm
