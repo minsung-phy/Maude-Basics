@@ -1,0 +1,10 @@
+mod TEST-REW2 is protecting NAT .
+sort Counter .
+ops rule1 rule2 rule3 : Nat -> Counter [ctor] .
+op f : Counter Counter Counter -> Counter [ctor] .
+var N : Nat .
+
+rl [rule1] : rule1(N) => rule1(s N) .
+rl [rule2] : rule2(N) => rule2(s N) .
+rl [rule3] : rule3(N) => rule3(s N) .
+endm
