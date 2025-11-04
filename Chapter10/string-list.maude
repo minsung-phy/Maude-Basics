@@ -1,0 +1,6 @@
+fmod STRING-LIST is protecting STRING .
+    sort StringList .
+    subsort String < StringList .
+    op nil : -> StringList [ctor] .
+    op __ : StringList StringList -> StringList [ctor assoc id: nil] .
+endfm

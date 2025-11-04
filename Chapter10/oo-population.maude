@@ -1,0 +1,69 @@
+mod OO-POPULATION is protecting NAT + STRING-LIST .
+
+    *** Objects, messages, object names, and configurations :
+    sorts Oid Object Msg Configuration .
+    subsorts Object Msg < Configuration .
+    op none : -> Configuration [ctor] .
+    op __ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
+
+    subsort String < Oid . *** Object names are Strings
+
+    *** Classes :
+    op <_: Names | OKnames:_> : Oid StringList -> Object [ctor] .
+    op <_: Person | age:_, status:_> : Oid Nat Status -> Object [ctor] .
+
+    *** Message for separating from spouse :
+    op separate : Oid -> Msg [ctor] .
+
+    sort Status .
+    op single : -> Status [ctor] .
+    ops engaged married separated : Oid -> Status [ctor] .
+
+    vars X X' X'' X''' : String .
+    vars N N' : Nat .
+    var S : Status .
+    vars L L' : StringList . 
+
+    crl [birthday] :
+        < X : Person | age: N, status: S >
+    => 
+        < X : Person | age: N + 1, status: S > if N < 999 .
+    
+    crl [engagement] :
+        < X : Person | age: N, status: single >
+        < X' : Person | age: N', status: single >
+    =>  
+        < X : Person | age: N, status: engaged(X') >
+        < X' : Person | age: N', status: engaged(X) >
+        if N > 15 /\ N' > 15 .
+    
+    crl [birth] :
+        < X : Person | age: N, status: married(X') >
+        < X'' : Names | OKnames: L X''' L' >
+    => 
+        < X : Person | age: N, status: married(X') >
+        < X'' : Names | OKnames: L X''' L' >
+        < X''' : Person | age: 0, status: single > if N < 60 .
+    
+    rl [separationInit] :
+        < X : Person | age: N, status: married(X') >
+    =>
+        < X : Person | age: N, status: separated(X') >
+        separate(X') .
+    
+    rl [acceptSeparation] :
+        separate(X)
+        < X : Person | age: N, status: married(X') >
+    =>
+        < X : Person | age: N, status: separated(X') > .
+    
+    *** Some rules are exercises and are therefore omitted
+
+    op greeks : -> Configuration .
+    eq greeks =
+        < "PossibleNames" : Names | OKnames: "Hera" "Zeus" "Hades" >
+        < "Gaia"   : Person | age: 999, status: separated("Uranus") >
+        < "Kronos" : Person | age: 803, status: separated("Rhea") >
+        < "Rhea"   : Person | age: 23,  status: separated("Kronos") >
+        < "Uranus" : Person | age: 901, status: separated("Gaia") > .
+endm
