@@ -1,0 +1,29 @@
+load full-maude
+
+(omod POPULATION is protecting NAT + STRING .
+    sort Status .
+    op single : -> Status [ctor] .
+    ops engaged married separated : Oid -> Status [ctor] .
+
+    subsort String < Oid .
+    class Person | age : Nat, status : Status .
+    vars N N' : Nat .
+    vars X X' : String .
+
+    crl [birthday] :
+        < X : Person | age : N >
+    => 
+        < X : Person | age : N + 1 > if N < 999 .
+    
+    crl [engagement] :
+        < X : Person | age : N, status : single >
+        < X' : Person | age : N', status : single >
+    =>
+        < X : Person | status : engaged(X') >
+        < X' : Person | status : engaged(X) > if N > 15 and N' > 15 .
+    
+    op greeks : -> Configuration .
+    eq greeks = 
+        < "Gaia" : Person | age : 999, status : married("Uranus") >
+        < "Uranus" : Person | age : 900, status : married("Gaia") > .
+endom)
