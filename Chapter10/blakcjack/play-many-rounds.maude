@@ -1,0 +1,26 @@
+(omod PLAY-MANY-ROUNDS is protecting PLAY-BJ .
+
+  class MultiPlayer | gamesLeft : Nat, money : Nat, eachBet : NzNat .
+  subclass MultiPlayer < Player .
+
+  vars T D P : Oid .           var NZN : NzNat .
+  vars CARDS1 CARDS2 : Cards . vars N N2 : Nat .
+
+  crl [reset] :
+    < T : Table | rndIndex : N, turn : D >
+    < D : Dealer | hand : CARDS1 >
+    < P : MultiPlayer | hand : CARDS2, bet : NZN, money : N2 >
+  =>
+    < T : Table | shoe : deck, rndIndex : s N, turn : T >
+    < D : Dealer | hand : nil >
+    < P : MultiPlayer | hand : nil, bet : 0,
+                        money : N2 + result(CARDS2,CARDS1,NZN) >
+  if bestValue(CARDS1) >= 17 .
+
+  crl [restart] :
+    < P : MultiPlayer | gamesLeft : s N, bet : 0,
+                        money : N2, eachBet : NZN >
+  =>
+    < P : MultiPlayer | gamesLeft : N, bet : NZN,
+                        money : sd(N2, NZN) >  if NZN <= N2 .
+endom)

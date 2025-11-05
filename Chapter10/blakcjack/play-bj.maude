@@ -1,0 +1,80 @@
+load full-maude
+
+(omod PLAY-BJ is protecting RESULT + RANDOM-CARD .
+
+  class Table  | shoe : Cards, rndIndex : Nat, turn : Oid .
+  class Player | hand : Cards, bet : Nat .
+  class Dealer | hand : Cards .
+
+  --- 게임 시작을 모델링하는 다음의 rewrite 규칙들:
+  --- 먼저 플레이어가 첫 장을 받고(startGame),
+  --- 그다음 딜러가 첫 장을 받으며(dealerFirstCard),
+  --- 이어서 플레이어가 두 번째 장을 받는다(playerSecond).
+  --- 카드를 한 장 뽑을 때마다 random용 인덱스는 증가해야 한다.
+
+  vars CARD CARD2 : Card .  vars CARDS CARDS2 : Cards .
+  var N : Nat .  var NZN : NzNat .  vars T P D : Oid .
+
+  rl [startGame] :
+    < T : Table | shoe : CARDS, rndIndex : N >
+    < P : Player | hand : nil, bet : NZN >
+  =>
+    < T : Table | shoe : remove(getRandomCard(CARDS, N), CARDS),
+                  rndIndex : s N >
+    < P : Player | hand : getRandomCard(CARDS, N) > .
+
+  rl [dealerFirstCard] :
+    < T : Table | shoe : CARDS, rndIndex : N >
+    < D : Dealer | hand : nil >
+    < P : Player | hand : CARD >
+  =>
+    < T : Table | shoe : remove(getRandomCard(CARDS, N), CARDS),
+                  rndIndex : s N >
+    < D : Dealer | hand : getRandomCard(CARDS, N) >
+    < P : Player | > .
+
+  rl [playerSecond] :
+    < T : Table | shoe : CARDS, rndIndex : N >
+    < P : Player | hand : CARD >
+    < D : Dealer | hand : CARD2 >
+  =>
+    < T : Table | shoe : remove(getRandomCard(CARDS, N), CARDS),
+                  rndIndex : s N, turn : P >
+    < P : Player | hand : CARD :: getRandomCard(CARDS, N) >
+    < D : Dealer | > .
+
+  --- 이제 플레이어는 위에서 기술된 단순 전략에 따라 hit 또는 stand 한다:
+
+  crl [playerHit] :
+    < T : Table | shoe : CARDS, rndIndex : N, turn : P >
+    < P : Player | hand : CARDS2 >
+  =>
+    < T : Table | shoe : remove(getRandomCard(CARDS, N), CARDS),
+                  rndIndex : s N >
+    < P : Player | hand : CARDS2 :: getRandomCard(CARDS, N) >
+  if not (leastValue(CARDS2) >= 15 or bestValue(CARDS2) >= 18) .
+
+  crl [playerStand] :
+    < T : Table | turn : P >
+    < P : Player | hand : CARDS2 >
+    < D : Dealer | >
+  =>
+    < T : Table | turn : D >
+    < P : Player | >
+    < D : Dealer | >
+  if leastValue(CARDS2) >= 15 or bestValue(CARDS2) >= 18 .
+
+  --- 마지막 규칙은 “딜러는 모든 17에서 선다(stand)”를 모델링한다:
+
+  crl [dealerTakesMore] :
+    < T : Table | turn : D, shoe : CARDS, rndIndex : N >
+    < D : Dealer | hand : CARD :: CARDS2 >
+  =>
+    < T : Table | shoe : remove(getRandomCard(CARDS,N),CARDS),
+                  rndIndex : s N >
+    < D : Dealer | hand : CARD :: CARDS2 :: getRandomCard(CARDS,N) >
+  if bestValue(CARD :: CARDS2) < 17 .
+
+  --- 마지막으로 세 개의 객체 식별자를 정의한다:
+  ops caesarsPalace peter t : -> Oid [ctor] .
+endom)

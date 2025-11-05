@@ -1,0 +1,15 @@
+fmod RANDOM-CARD is  protecting RANDOM + CARD .
+  var N : Nat .   var CARD : Card .   var CARDS : Cards .
+
+  op size : Cards -> Nat .           --- no of cards in a hand
+  eq size(nil) = 0 .  
+  eq size(CARD :: CARDS) = s(size(CARDS)) .
+
+  op getNthCard : Nat Cards ~> Card . --- get card N+1
+  eq getNthCard(0, CARD :: CARDS) = CARD .
+  eq getNthCard(s N, CARD :: CARDS) = getNthCard(N, CARDS) .
+
+  op getRandomCard : Cards Nat ~> Card .
+  eq getRandomCard(CARDS, N)
+   = getNthCard(random(N) rem size(CARDS), CARDS) .
+endfm

@@ -1,0 +1,20 @@
+fmod CARD is
+    sorts Suit Value Card .
+    ops 2 3 4 5 6 7 8 9 10 J Q K A -> Value [ctor] .
+    ops spades hearts clubs diamonds : -> Suit [ctor] .
+    op <_,_> : Suit Value -> Card [ctor] .
+
+    sort Cards .  subsort Card < Cards .
+    op nil : -> Cards [ctor] .
+    op _::_ : Cards Cards -> Cards [assoc id: nil ctor] .
+
+    op deck : -> Cards .
+    eq deck = generate(spades) :: generate(hearts) ::
+                generate(diamonds) :: generate(clubs) .
+    op generate : Suit -> Cards . --- generate all cards of a Suit
+    var S : Suit .
+    eq generate(S) = < S, 2 > :: < S, 3 > :: < S, 4 > :: < S, 5 > ::
+                     < S, 6 > :: < S, 7 > :: < S, 8 > :: < S, 9 > ::   
+                     < S, 10 > :: < S, J > :: < S, Q > :: < S, K > ::
+                     < S, A > .
+endfm

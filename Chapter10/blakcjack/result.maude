@@ -1,0 +1,41 @@
+fmod RESULT is protecting CARD + NAT .
+    ops leastValue largestValue bestValue : Cards -> Nat .
+
+    var S : Suit . 
+    var V : Value . 
+    var BET : Nat .
+    vars HAND PLAYER DEALER : Cards . 
+    var CARD : Card .
+
+    eq leastValue(< S, 2 >) = 2 . 
+    eq leastValue(< S, 3 >) = 3 .
+    eq leastValue(< S, 4 >) = 4 . 
+    eq leastValue(< S, 5 >) = 5 . 
+    eq leastValue(< S, 6 >) = 6 . 
+    eq leastValue(< S, 7 >) = 7 .
+    eq leastValue(< S, 8 >) = 8 . 
+    eq leastValue(< S, 9 >) = 9 . 
+    eq leastValue(< S, J >) = 10 . 
+    eq leastValue(< S, Q >) = 10 . 
+    eq leastValue(< S, K >) = 10 . 
+    eq leastValue(< S, A >) = 1 .
+    eq leastValue(nil) = 0 .
+    ceq leastValue(CARD :: HAND) = leastValue(CARD) + leastValue(HAND) if HAND =/= nil .
+
+    op result : Cards Cards Nat -> Nat .
+    eq result(PLAYER, DEALER, BET)
+    = if blackJack(PLAYER) and (not blackJack(DEALER))
+        then (5 * BET) quo 2                  --- blackjack!
+        else (if bestValue(PLAYER) <= 21 and
+                    (bestValue(PLAYER) > bestValue(DEALER)
+                    or leastValue(DEALER) > 21)
+                then (BET + BET)                --- player wins
+                else (if (blackJack(PLAYER) and blackJack(DEALER))
+                        or
+                        ((not blackJack(DEALER))
+                        and
+                        (bestValue(PLAYER) <= 21)
+                        and (bestValue(PLAYER) == bestValue(DEALER)))
+                    then BET                  --- push
+                    else 0 fi) fi) fi .       --- player loses
+endfm
