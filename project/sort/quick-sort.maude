@@ -1,0 +1,36 @@
+load list-int.maude .
+
+fmod QUICK-SORT is protecting LIST-INT .
+    op quicksort : List -> List .
+
+    vars L L' : List .
+    vars M N : Int .
+    vars N1 N2 N3 M1 M2 M3 : Int .
+    
+    eq quicksort(nil) = nil .
+    eq quicksort(L N L') = quicksort(smallerElements(L L', N))
+                            equalElements(L N L', N)
+                            quicksort(greaterElements(L L', N)) .
+
+    ops smallerElements greaterElements equalElements : List Int -> List .
+
+    eq smallerElements(nil, N) = nil .
+    eq smallerElements(N L, M) = if N < M then 
+                                    (N smallerElements(L, M))
+                                else smallerElements(L, M) fi .
+    
+    eq equalElements(nil, N) = nil .
+    eq equalElements(N L, M) = if N == M then (N equalElements (L, M))
+                                else equalElements(L, M) fi .
+    
+    eq greaterElements(nil, N) = nil .
+    eq greaterElements(N L, M) = if N > M then    
+                                    (N greaterElements(L, M))
+                                else greaterElements(L, M) fi .
+    
+    op sum : List -> Int .
+
+    eq sum(nil) = 0 .
+    eq sum(N L) = N + sum(L) .
+endfm
+

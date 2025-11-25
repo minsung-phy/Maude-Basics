@@ -1,0 +1,8 @@
+fmod LIST-INT is
+  protecting INT .
+  sorts List .
+  subsort Int < List .
+
+  op nil : -> List .
+  op __ : List List -> List [ctor assoc id: nil] .
+endfm
