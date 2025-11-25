@@ -1,0 +1,34 @@
+mod RESCUE-SIMPLE is   
+    protecting NAT . --- 자연수 사용
+
+    --- 위치, 플레이어, 피해자, 전체 상태 정의
+    sorts Pos Player Victim State .
+
+    subsort Nat < Pos . --- 위치를 0,1,2,3 자연수로 본다고 가정
+
+    --- 플레이어 : ID와 위치
+    op player : Nat Pos -> Player [ctor] .
+    
+    --- 피해자 : ID, 위치, 구조 여부
+    op victim : Nat Pos Bool -> Victim [ctor] .
+
+    --- 전체 게임 상태 : 시간, 플레이어, 피해자
+    op state : Nat Player Victim -> State [ctor] .
+
+    --- 변수 선언
+    vars T PID X VID VX : Nat .
+    var Resc? : Bool .
+
+    --- 오른쪽으로 한 칸 이동 (위치 < 3 인 경우만)
+    crl [move-right] :
+        state(T, player(PID, X), victim(VID, VX, Resc?))
+    =>  
+        state(T, player(PID, s X), victim(VID, VX, Resc?))
+    if X < 3 /\ Resc? == false .
+
+    --- 구조 (플레이어 위치 = 피해자 위치)
+    rl [rescue] :
+        state(T, player(PID, X), victim(VID, X, false))
+    =>
+        state(T, player(PID, X), victim(VID, X, true)) .
+endm
