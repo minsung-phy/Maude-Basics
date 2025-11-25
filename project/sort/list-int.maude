@@ -1,8 +1,17 @@
 fmod LIST-INT is
   protecting INT .
-  sorts List .
-  subsort Int < List .
-
+  sorts List NeList .
+  subsort NeList < List .
+  subsort Int < NeList .
+  
   op nil : -> List .
-  op __ : List List -> List [ctor assoc id: nil] .
+
+  op __ : Int List -> NeList [ctor] .
+
+  vars N : Int .
+  vars L : List .
+
+  op length : List -> Int .
+  eq length(nil) = 0 .
+  eq length(N L) = 1 + length(L) .
 endfm
