@@ -1,0 +1,32 @@
+load list-int.maude .
+
+fmod INSERTION-SORT is
+    protecting LIST-INT .
+
+    --- 정렬 함수
+    op insertionSort : List -> List .
+
+    --- 정렬된 리스트에 한 원소를 끼워 넣는 함수
+    op insert : Int List -> List .
+
+    vars I J : Int .
+    var L : List .
+    vars M1 M2 : Int . --- for search
+    vars Lpre Lpost : List . --- for search
+
+    --- 빈 리스트는 이미 정렬되어 있음
+    eq insertionSort(nil) = nil .
+
+    --- 첫 원소 I를 떼어 내고, 나머지 L을 재귀적으로 정렬한 뒤
+    --- 정렬된 리스트에 I를 끼워 넣는다.
+    eq insertionSort(I L) = insert(I, insertionSort(L)) .
+
+    --- 빈 리스트에 I를 끼워 넣으면, 리스트는 I 한 개뿐
+    eq insert(I, nil) = I .
+
+    --- I <= J 인 경우, I를 앞에 놓으면 정렬 조건을 유지
+    ceq insert(I, J L) = I J L if I <= J .
+
+    --- I > J 인 경우, J를 유지하고 나머지 L에 I를 삽입
+    ceq insert(I, J L) = J insert(I, L) if I > J .
+endfm
