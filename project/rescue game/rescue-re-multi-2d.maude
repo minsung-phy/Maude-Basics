@@ -1,0 +1,74 @@
+mod RESCUE-RT-MULTI-2D is
+    --- Real-Time Maude에서 시간 도메인, oo, min 등을 위해 사용하는 모듈
+    including NAT-TIME-DOMAIN-WITH-INF .
+
+    --- 내가 만든 구조 게임(discrete-time) 모듈
+    protecting RESCUE-MULTI-2D .
+
+    ----------------------------------------------------------------------
+    --- Configuration 정의 (State를 포함하는 멀티셋 구조)
+    ----------------------------------------------------------------------
+    sort Conf .
+    subsort State < Conf .
+
+    op none : -> Conf [ctor] .
+    op __   : Conf Conf -> Conf [ctor assoc comm id: none] .
+
+    ----------------------------------------------------------------------
+    --- timeEffect : Conf × Time -> Conf
+    ---  책 17.1.1 패턴을 따라, 구성요소에 시간 경과를 적용
+    ---  여기서는 State(T, ...)의 T에 DT를 더해주는 식으로 시도
+    ----------------------------------------------------------------------
+    op timeEffect : Conf Time -> Conf [frozen (1)] .
+
+    vars C1 C2 : Conf .
+    var  DT    : Time .
+    vars T D1 D2 : Nat .
+    vars P1 P2 : Player . 
+    vars V0 V1 : Victim .
+
+    --- 빈 구성에는 아무 변화 없음
+    eq timeEffect(none, DT) = none .
+
+    --- 멀티셋에 분배
+    ceq timeEffect(C1 C2, DT) 
+      = timeEffect(C1, DT) timeEffect(C2, DT) 
+      if C1 =/= none and C2 =/= none .
+
+    --- 구조 게임의 State에 대해서는 T를 DT만큼 증가시키도록 시도
+    eq timeEffect(state(T, P1, P2, V0, V1), DT) = state(T + DT, P1, P2, V0, V1) .
+
+    ----------------------------------------------------------------------
+    --- mte : Conf -> TimeInf
+    ---  이 구성에서 허용되는 최대 시간 경과
+    ---  지금은 단순하게 항상 1로 두어, 한 번에 1씩만 흘리도록 구현
+    ----------------------------------------------------------------------
+    op mte : Conf -> TimeInf [frozen (1)] .
+
+    eq mte(none) = oo .
+
+    ceq mte(C1 C2)
+      = min(mte(C1), mte(C2))
+      if C1 =/= none and C2 =/= none .
+
+    --- State 하나만 있을 때는 1까지 허용
+    eq mte(S:State) = 1 .
+
+    ----------------------------------------------------------------------
+    --- 전역 상태 { ... } 와 tick 규칙
+    ----------------------------------------------------------------------
+    sort GlobalState .
+    subsort Conf < GlobalState .
+    op {_} : Conf -> GlobalState [ctor] .
+
+    var C  : Conf .
+    var DT' : Time .
+
+    --- tick 규칙: ΔT 만큼 시간이 흐르면서 구성에 timeEffect 적용
+    crl [tick] :
+      { C }
+    =>
+      { timeEffect(C, DT') }
+    in time DT'
+    if DT' <= mte(C) .
+endm
