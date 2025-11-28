@@ -31,4 +31,17 @@ fmod MINI-C-SYNTAX is
 
     --- 출력
     op printf : Int -> Stmt [ctor] .
+
+    --- Heap 관련 문장들
+    --- X = malloc(n);
+    op mallocS : Id Int -> Stmt [ctor] .
+
+    --- X = *p;   (p는 주소(포인터) 식)
+    op loadS   : Id Int -> Stmt [ctor] .
+
+    --- *p = v;  (p: 주소 식, v: 값 식)
+    op storeS  : Int Int -> Stmt [ctor] .
+
+    --- free(p); (p: 주소 식)
+    op freeS   : Int -> Stmt [ctor] .
 endfm

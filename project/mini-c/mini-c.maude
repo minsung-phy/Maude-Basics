@@ -14,22 +14,32 @@ mod MINI-C is
     op nilOut : -> Out [ctor] .
     op _:_    : Int Out -> Out [ctor] .            --- 3 : 5 : nilOut
 
+    --- Heap : 주소(Int) -> 값(Int)
+    sorts Heap HCell .
+    subsort HCell < Heap .
+
+    --- 빈 힙과 셀
+    op emptyHeap : -> Heap [ctor] .
+    op _&_ : HCell Heap -> Heap [ctor] . --- 셀 & 나머지 힙
+    op _|=>_ : Int Int -> HCell [ctor] . --- addr |=> value
+
     --- 전체 구성
     sort Config .
-    op <_,_,_> : Env StmtList Out -> Config [ctor] .
+    op <_,_,_,_> : Env Heap StmtList Out -> Config [ctor] .
+
+    --- 초기 상태 생성
+    op init : StmtList -> Config .
+    eq init(SL) = < emptyEnv, emptyHeap, SL, nilOut > .
 
     --- 변수 선언
     vars SL SL1 SL2 BODY : StmtList .
     vars X Y             : Id .
-    vars N M             : Int .
-    vars A A1 A2         : Int .
+    vars N M P V W       : Int .
+    vars A A' A1 A2      : Int .
     vars B B1 B2         : Bool .
-    var E               : Env .
-    var O               : Out .
-
-    --- 초기 상태 생성
-    op init : StmtList -> Config .
-    eq init(SL) = < emptyEnv , SL , nilOut > .
+    var E                : Env .
+    var O                : Out .
+    var H                : Heap .
 
     --- lookup / update 정의
     op lookup : Id Env -> Int .
@@ -82,52 +92,104 @@ mod MINI-C is
     eq evalB(true, E) = true . --- 패턴이 안맞을때
     eq evalB(false, E) = false .
 
+    --- Heap 연산
+    op maxAddr : Heap -> Int . --- Heap 안에서 가장 큰 주소
+    op alloc : Heap -> Int . --- fresh 주소
+    op load : Int Heap -> Int . --- 메모리 읽기
+    op store : Int Int Heap -> Heap . --- 메모리 쓰기
+    op free : Int Heap -> Heap . --- 메모리 해제
+
+    eq maxAddr(emptyHeap) = 0 .
+    eq maxAddr((A |=> V) & H) = 
+        if A >= maxAddr(H) then A else maxAddr(H) fi .
+    
+    eq alloc(H) = maxAddr(H) + 1 .
+
+    eq load(A, (A |=> V) & H) = V .
+    ceq load(A, (A' |=> V) & H)  = load(A, H) 
+        if A =/= A' .
+    eq load(A, emptyHeap) = 0 .
+
+    eq store(A, V, emptyHeap) = (A |=> V) & emptyHeap .
+    eq store(A, V, (A |=> W) & H) = (A |=> V) & H .
+    ceq store(A, V, (A' |=> W) & H) = (A' |=> W) & store(A, V, H)
+        if A =/= A' .    
+
+    eq free(A, emptyHeap) = emptyHeap .
+    eq free(A, (A |=> V) & H) = H .
+    ceq free(A, (A' |=> V) & H) = (A' |=> V) & free(A, H)
+        if A =/= A' .
+
     ---------------------------------
     --- 작은 단계 의미론 (rewrite rules)
     ---------------------------------
 
     --- 대입문: X := A;
     rl [assign] :
-        < E , (X := A) ; SL , O >
+        < E , H , (X := A) ; SL , O >
     =>
-        < update(X, eval(A, E), E) , SL , O > .
+        < update(X, eval(A, E), E) , H , SL , O > .
 
     --- printf(A);
     rl [printf] :
-        < E , printf(A) ; SL , O >
+        < E , H , printf(A) ; SL , O >
     =>
-        < E , SL , eval(A, E) : O > .
+        < E , H , SL , eval(A, E) : O > .
 
     --- skip; S  ->  S
     rl [skip] :
-        < E , skip ; SL , O >
+        < E , H , skip ; SL , O >
     =>
-        < E , SL , O > .
+        < E , H , SL , O > .
 
     --- if 문
     crl [if-true] :
-        < E , ifStmt(B, SL1, SL2) ; SL , O >
+        < E , H , ifStmt(B, SL1, SL2) ; SL , O >
     =>
-        < E , SL1 ; SL , O >
+        < E , H , SL1 ; SL , O >
     if evalB(B, E) == true .
 
     crl [if-false] :
-        < E , ifStmt(B, SL1, SL2) ; SL , O >
+        < E , H , ifStmt(B, SL1, SL2) ; SL , O >
     =>
-        < E , SL2 ; SL , O >
+        < E , H , SL2 ; SL , O >
     if evalB(B, E) == false .
 
     --- while B do BODY od
     ---  -> if B then BODY ; while B do BODY od else skip
     rl [while] :
-        < E , whileStmt(B, BODY) ; SL , O >
+        < E , H , whileStmt(B, BODY) ; SL , O >
     =>
-        < E , ifStmt(B, BODY ; (whileStmt(B, BODY) ; nil), skip ; nil) ; SL , O > .
+        < E , H , ifStmt(B, BODY ; (whileStmt(B, BODY) ; nil), skip ; nil) ; SL , O > .
 
     --- for (Init; Cond; Step) Body
     --- ==> Init ; while (Cond) { Body; Step }
     rl [for] :
-        < E , forStmt(SL1, B, SL2, BODY) ; SL , O >
+        < E , H , forStmt(SL1, B, SL2, BODY) ; SL , O >
     => 
-        < E, SL1 ; whileStmt(B, BODY ; SL2) ; SL , O > .
+        < E , H ,SL1 ; whileStmt(B, BODY ; SL2) ; SL , O > .
+
+    --- X = malloc(n);
+    rl [malloc] :
+        < E , H , mallocS(X, N) ; SL , O >
+    =>
+        < update(X, alloc(H), E) , store(alloc(H), 0 , H) , SL, O > .
+
+    --- X = *p;
+    rl [load] :
+        < E, H, loadS(X, P) ; SL, O >
+    =>
+        < update(X, load(eval(P, E), H), E), H, SL, O > .
+
+    --- *p = v;
+    rl [store] :
+        < E, H, storeS(P, V) ; SL, O >
+    =>
+        < E, store(eval(P, E), eval(V, E), H), SL, O > .
+
+    --- free(p);
+    rl [free] : 
+        < E, H, freeS(P) ; SL, O >
+    =>
+        < E, free(eval(P, E), H), SL, O > .    
 endm
