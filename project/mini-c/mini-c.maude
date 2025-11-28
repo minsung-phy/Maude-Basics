@@ -123,4 +123,11 @@ mod MINI-C is
         < E , whileStmt(B, BODY) ; SL , O >
     =>
         < E , ifStmt(B, BODY ; (whileStmt(B, BODY) ; nil), skip ; nil) ; SL , O > .
+
+    --- for (Init; Cond; Step) Body
+    --- ==> Init ; while (Cond) { Body; Step }
+    rl [for] :
+        < E , forStmt(SL1, B, SL2, BODY) ; SL , O >
+    => 
+        < E, SL1 ; whileStmt(B, BODY ; SL2) ; SL , O > .
 endm

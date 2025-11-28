@@ -24,9 +24,10 @@ fmod MINI-C-SYNTAX is
     op skip : -> Stmt [ctor] .
     op _:=_ : Id Int -> Stmt [ctor] .   --- x := 3;
 
-    --- if / while 문
+    --- if / while / for 문
     op ifStmt    : Bool StmtList StmtList -> Stmt [ctor] .
     op whileStmt : Bool StmtList -> Stmt [ctor] .
+    op forStmt : StmtList Bool StmtList StmtList -> Stmt [ctor] .
 
     --- 출력
     op printf : Int -> Stmt [ctor] .
