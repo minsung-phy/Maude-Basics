@@ -1,0 +1,126 @@
+mod MINI-C is
+    protecting MINI-C-SYNTAX .
+
+    --- 환경(Env) : 변수 → 정수
+    sorts Env Binding .
+    subsort Binding < Env .
+
+    op emptyEnv : -> Env [ctor] .
+    op _&_      : Binding Env -> Env [ctor] .      --- (Binding & 나머지 환경)
+    op _|->_    : Id Int -> Binding [ctor] .       --- x |-> 3
+
+    --- 출력 리스트
+    sort Out .
+    op nilOut : -> Out [ctor] .
+    op _:_    : Int Out -> Out [ctor] .            --- 3 : 5 : nilOut
+
+    --- 전체 구성
+    sort Config .
+    op <_,_,_> : Env StmtList Out -> Config [ctor] .
+
+    --- 변수 선언
+    vars SL SL1 SL2 BODY : StmtList .
+    vars X Y             : Id .
+    vars N M             : Int .
+    vars A A1 A2         : Int .
+    vars B B1 B2         : Bool .
+    var E               : Env .
+    var O               : Out .
+
+    --- 초기 상태 생성
+    op init : StmtList -> Config .
+    eq init(SL) = < emptyEnv , SL , nilOut > .
+
+    --- lookup / update 정의
+    op lookup : Id Env -> Int .
+    op update : Id Int Env -> Env .
+
+    --- 선언 안 된 변수는 0이라고 가정
+    eq lookup(X, emptyEnv) = 0 .
+    eq lookup(X, (X |-> N) & E) = N .
+    ceq lookup(X, (Y |-> N) & E) = lookup(X, E)
+        if X =/= Y .
+
+    eq update(X, N, emptyEnv) = (X |-> N) & emptyEnv .
+    eq update(X, N, (X |-> M) & E) = (X |-> N) & E .
+    ceq update(X, N, (Y |-> M) & E) = (Y |-> M) & update(X, N, E)
+        if X =/= Y .
+
+    --- 정수식 평가
+    op eval : Int Env -> Int .
+
+    eq eval(var(X), E)       = lookup(X, E) .
+    eq eval(A1 + A2, E)      = eval(A1, E) + eval(A2, E) .
+    eq eval(A1 - A2, E)      = eval(A1, E) - eval(A2, E) .
+    eq eval(A1 * A2, E)      = eval(A1, E) * eval(A2, E) .
+    eq eval(A1 / A2, E)      = divInt(eval(A1, E), eval(A2, E)) .
+    eq eval(A, E) = A [owise] .
+
+    op divInt : Int Int -> Int .
+
+    vars I J : Int .
+    ceq divInt(I, J) = 0
+       if I >= 0 and J > 0 and I < J .
+    ceq divInt(I, J) = divInt(I - J, J) + 1
+        if I >= 0 and J > 0 and I >= J .
+
+    --- Bool 식 평가
+    op evalB : Bool Env -> Bool .
+
+    eq evalB(A1 <  A2, E) = (eval(A1, E) <  eval(A2, E)) .
+    eq evalB(A1 >  A2, E) = (eval(A1, E) >  eval(A2, E)) .
+    eq evalB(A1 <= A2, E) = (eval(A1, E) <= eval(A2, E)) .
+    eq evalB(A1 >= A2, E) = (eval(A1, E) >= eval(A2, E)) .
+
+    eq evalB(not B, E) = not evalB(B, E) .
+
+    eq evalB(B1 and B2, E) = evalB(B1, E) and evalB(B2, E) .
+    eq evalB(B1 or  B2, E) = evalB(B1, E) or  evalB(B2, E) .
+
+    eq evalB(B1 xor B2, E) = evalB(B1, E) xor evalB(B2, E) .
+
+    eq evalB(true, E) = true . --- 패턴이 안맞을때
+    eq evalB(false, E) = false .
+
+    ---------------------------------
+    --- 작은 단계 의미론 (rewrite rules)
+    ---------------------------------
+
+    --- 대입문: X := A;
+    rl [assign] :
+        < E , (X := A) ; SL , O >
+    =>
+        < update(X, eval(A, E), E) , SL , O > .
+
+    --- printf(A);
+    rl [printf] :
+        < E , printf(A) ; SL , O >
+    =>
+        < E , SL , eval(A, E) : O > .
+
+    --- skip; S  ->  S
+    rl [skip] :
+        < E , skip ; SL , O >
+    =>
+        < E , SL , O > .
+
+    --- if 문
+    crl [if-true] :
+        < E , ifStmt(B, SL1, SL2) ; SL , O >
+    =>
+        < E , SL1 ; SL , O >
+    if evalB(B, E) == true .
+
+    crl [if-false] :
+        < E , ifStmt(B, SL1, SL2) ; SL , O >
+    =>
+        < E , SL2 ; SL , O >
+    if evalB(B, E) == false .
+
+    --- while B do BODY od
+    ---  -> if B then BODY ; while B do BODY od else skip
+    rl [while] :
+        < E , whileStmt(B, BODY) ; SL , O >
+    =>
+        < E , ifStmt(B, BODY ; (whileStmt(B, BODY) ; nil), skip ; nil) ; SL , O > .
+endm
