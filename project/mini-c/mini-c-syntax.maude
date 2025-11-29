@@ -43,6 +43,6 @@ fmod MINI-C-SYNTAX is
     --- *p = v;  (p: 주소 식, v: 값 식)
     op storeS  : Int Int -> Stmt [ctor] .
 
-    --- free(p); (p: 주소 식)
+    --- free(p); (p: 주소 식) 
     op freeS   : Int -> Stmt [ctor] .
 endfm

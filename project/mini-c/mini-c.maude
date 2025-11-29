@@ -78,9 +78,9 @@ mod MINI-C is
     --- 정수식 평가: eval : Int(식) × Env -> Int(값)
     op eval : Int Env -> Int .
 
-    vars A A1 A2 : Int .
-    vars X Y     : Id .
-    var E        : Env .
+    vars A A' A1 A2 : Int .
+    vars X Y        : Id .
+    var E           : Env .
 
     eq eval(var(X), E)  = lookup(X, E) .
     eq eval(A1 + A2, E) = eval(A1, E) + eval(A2, E) .
