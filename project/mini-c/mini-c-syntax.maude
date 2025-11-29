@@ -1,15 +1,16 @@
 fmod MINI-C-SYNTAX is
+    --- 기본 정수 / Bool 이론
     protecting INT .    --- Int, +, -, *, /, <, >, <=, >=
-    protecting BOOL .   --- Bool, true, false
+    protecting BOOL .   --- Bool, true, false, and, or, xor, not
 
-    --- 변수 이름
+    --- 변수 이름 (식별자)
     sort Id .
     ops x y z : -> Id [ctor] .
     
     --- 변수 참조: var(x)는 "x의 값"을 나타내는 Int 식
     op var : Id -> Int [ctor] .
 
-    --- 나눗셈
+    --- 산술 나눗셈 기호 (문법용)
     op _/_ : Int Int -> Int [ctor] .    
 
     --- 문장 / 문장 리스트
@@ -18,21 +19,21 @@ fmod MINI-C-SYNTAX is
 
     --- 문장 리스트 연산 (연속 실행)
     op nil  : -> StmtList [ctor] .
-    op _;_  : StmtList StmtList -> StmtList [ctor assoc id: nil] .  --- 예: (x := 0) ; (y := 1) ; nil
+    op _;_  : StmtList StmtList -> StmtList [ctor assoc id: nil] .      --- 예: (x := 0) ; (y := 1) ; nil
 
     --- 기본 문장들
     op skip : -> Stmt [ctor] .
-    op _:=_ : Id Int -> Stmt [ctor] .   --- x := 3;
+    op _:=_ : Id Int -> Stmt [ctor] .       --- x := 3;
 
     --- if / while / for 문
     op ifStmt    : Bool StmtList StmtList -> Stmt [ctor] .
     op whileStmt : Bool StmtList -> Stmt [ctor] .
-    op forStmt : StmtList Bool StmtList StmtList -> Stmt [ctor] .
+    op forStmt   : StmtList Bool StmtList StmtList -> Stmt [ctor] .
 
     --- 출력
     op printf : Int -> Stmt [ctor] .
 
-    --- Heap 관련 문장들
+    --- Heap 관련 문장들 (동적 메모리 연산)
     --- X = malloc(n);
     op mallocS : Id Int -> Stmt [ctor] .
 
